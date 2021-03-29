@@ -12,7 +12,7 @@ Tested on Python 3.8+
 First step: set your crt and key files path as environment variables. (SEE `.env` file)
 
 
-Example:
+**Example (Create Order):**
 
 ```python
 >>> from kapital_gateway import KapitalPayment
@@ -28,11 +28,43 @@ Example:
 >>> print(result)
 ```
 
-Result:
+**Result:**
 
 ```python
->>> {'url' : 'https://e-commerce.kapitalbank.az/?ORDERID=<Order Id>&SESSIONID=<Session Id>'}
+>>> {'url' : 'https://e-commerce.kapitalbank.az/?ORDERID=12345&SESSIONID=A12345'}
 ```
 
+**Example (Check Order Status):**
 
-(C) Arzu Hussein
+```python
+>>> result = gateway.get_order_status(order_id=12345, session_id="A12345", lang="AZ")
+>>> print(result)
+```
+
+**Result:**
+
+ returns `PaymentStatus` object
+
+```python
+>>> PaymentStatus(order_id=12345, status_code='00', state='CREATED')
+```
+
+### Methods
+
+**Example: get_payment()**
+
+```python
+>>> payment_obj = gateway.get_payment()
+>>> payment_obj
+>>> Payment(amount=123456, order_id=12345, session_id='A12345', payment_url='https://e-commerce.kapitalbank.az/index.jsp', status_code='00',order_description='xxxxxx', currency=944, language_code='RU')
+```
+
+**Example: get_payment_status()**
+
+```python
+>>> payment_status_obj = gateway.get_payment_status()
+>>> payment_status_obj
+>>> PaymentStatus(order_id=12345, status_code='00', state='CREATED')
+```
+
+***(C) Arzu Hussein***

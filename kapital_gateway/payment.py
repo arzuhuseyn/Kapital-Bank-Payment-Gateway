@@ -11,3 +11,10 @@ class Payment:
     order_description: str
     currency: str
     language_code: str
+
+
+@dataclass
+class PaymentStatus:
+    order_id: int
+    status_code: str
+    state: str
