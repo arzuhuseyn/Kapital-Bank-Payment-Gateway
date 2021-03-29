@@ -1,4 +1,5 @@
 import os
+from typing import Any
 import requests
 from xml.dom import minidom
 
@@ -6,7 +7,8 @@ from payment import Payment
 
 
 class KapitalPayment:
-    SERVICE_URL = 'https://e-commerce.kapitalbank.az:5443/Exec'
+    BASE_URL = 'https://e-commerce.kapitalbank.az'
+    PORT = '5443'
     
     CERT_FILE = os.getenv("KAPITAL_CERT_FILE", "certs/E1000010.crt")
     KEY_FILE = os.getenv("KAPITAL_KEY_FILE", "certs/E1000010.key")
@@ -22,13 +24,14 @@ class KapitalPayment:
         self.approve_url=approve_url
         self.cancel_url=cancel_url
         self.decline_url=decline_url
+        self.__payment_instance=None
 
-    def __post(self, data):
+    def __post(self, data: str) -> str:
         headers = {'Content-Type': 'application/xml'} 
-        r = requests.post(self.SERVICE_URL, data=data, verify=False, headers=headers, cert=(self.CERT_FILE, self.KEY_FILE))
+        r = requests.post(f'{self.BASE_URL}:{self.PORT}/Exec', data=data, verify=False, headers=headers, cert=(self.CERT_FILE, self.KEY_FILE))
         return r.text
 
-    def __build_createorder_xml(self, data):
+    def __build_createorder_xml(self, data: str) -> str:
         return f'''<?xml version="1.0" encoding="UTF-8"?>
         <TKKPG>
         <Request>
@@ -47,22 +50,24 @@ class KapitalPayment:
         </Request>
         </TKKPG>'''
 
-    def create_order(self, amount: int, currency: int, description: str, lang: str):
-        order_data = {
-            'merchant' : self.merchant_id,
-            'amount' : amount,
-            'currency': currency,
-            'description': description,
-            'lang': lang
-        }
-        xml_data=self.__build_createorder_xml(order_data)
-        result=self.__post(xml_data)
-        return self.__handle_response(order_data, result)
+    def __build_getorderstatus_xml(self, data: str) -> str:
+        return f'''<?xml version="1.0"encoding="UTF-8"?>
+        <TKKPG>
+            <Request>
+                <Operation>GetOrderStatus</Operation>
+                <Language>{data['lang']}</Language>
+                <Order>
+                    <Merchant>{self.merchant_id}</Merchant>
+                    <OrderID>{data['order_id']}</OrderID>
+                </Order>
+                <SessionID>{data['session_id']}</SessionID>
+            </Request>
+        </TKKPG>'''
 
-    def __handle_response(self, initial_data, response):
+    def __handle_response(self, initial_data: str, response: str) -> None:
         xml_data=minidom.parseString(response).documentElement
 
-        payment_instance=Payment(
+        self.__payment_instance=Payment(
             amount=initial_data.get('amount'),
             order_id=int(xml_data.getElementsByTagName('OrderID')[0].firstChild.data),
             session_id=xml_data.getElementsByTagName('SessionID')[0].firstChild.data,
@@ -72,5 +77,20 @@ class KapitalPayment:
             currency=initial_data.get('currency'),
             language_code=initial_data.get('lang')
         )
+    
+    def get_payment_obj(self) -> Payment:
+        return self.__payment_instance
 
-        return payment_instance
+    def create_order(self, amount: int, currency: int, description: str, lang: str) -> dict:
+        order_data = {
+            'merchant' : self.merchant_id,
+            'amount' : amount,
+            'currency': currency,
+            'description': description,
+            'lang': lang
+        }
+        xml_data=self.__build_createorder_xml(order_data)
+        result=self.__post(xml_data)
+        self.__handle_response(order_data, result)
+        payment=self.get_payment_obj()
+        return {'url' : f'{self.BASE_URL}/?ORDERID={payment.order_id}&SESSIONID={payment.session_id}'}
