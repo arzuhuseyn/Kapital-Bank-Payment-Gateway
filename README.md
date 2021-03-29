@@ -5,7 +5,7 @@ Kapital Bank Payment Gateway for python based projects.
 
  ### Compatibility
 
-Tested on Python 3.7+
+Tested on Python 3.8+
 
 ### Get Started
 
@@ -33,3 +33,6 @@ Result:
 ```python
 >>> {'url' : 'https://e-commerce.kapitalbank.az/?ORDERID=<Order Id>&SESSIONID=<Session Id>'}
 ```
+
+
+(C) Arzu Hussein
