@@ -3,7 +3,7 @@ from typing import Any
 import requests
 from xml.dom import minidom
 
-from payment import Payment
+from .payment import Payment
 
 
 class KapitalPayment:
