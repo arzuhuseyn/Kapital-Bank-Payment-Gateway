@@ -15,10 +15,10 @@ class KapitalPayment:
 
     def __init__(
         self,
-        merchant_id,
-        approve_url,
-        cancel_url,
-        decline_url,
+        merchant_id: int,
+        approve_url: str,
+        cancel_url: str,
+        decline_url: str,
         ) -> None:
         self.merchant_id=merchant_id 
         self.approve_url=approve_url
@@ -39,7 +39,7 @@ class KapitalPayment:
         )
         return r.text
 
-    def __build_createorder_xml(self, data: str) -> str:
+    def __build_createorder_xml(self, data: dict) -> str:
         return f'''<?xml version="1.0" encoding="UTF-8"?>
         <TKKPG>
         <Request>
@@ -58,7 +58,7 @@ class KapitalPayment:
         </Request>
         </TKKPG>'''
 
-    def __build_getorderstatus_xml(self, data: str) -> str:
+    def __build_getorderstatus_xml(self, data: dict) -> str:
         return f'''<?xml version="1.0" encoding="UTF-8"?>
         <TKKPG>
             <Request>
