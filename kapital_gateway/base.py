@@ -15,7 +15,7 @@ class KapitalPayment:
 
     def __init__(
         self,
-        merchant_id: int,
+        merchant_id: str,
         approve_url: str,
         cancel_url: str,
         decline_url: str,
