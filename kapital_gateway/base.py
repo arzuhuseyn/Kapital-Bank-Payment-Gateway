@@ -72,7 +72,7 @@ class KapitalPayment:
             </Request>
         </TKKPG>'''
 
-    def __build_payment_obj(self, initial_data: str, response: str) -> None:
+    def __build_payment_obj(self, initial_data: dict, response: str) -> None:
         xml_data=minidom.parseString(response).documentElement
 
         self.__payment_instance=Payment(
