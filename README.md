@@ -25,7 +25,7 @@ First step: set your crt and key files path as environment variables. (SEE `.env
 >>>        decline_url="https://test.com/decline",
 >>>    )
 
->>> result = gateway.create_order(amount=10, currency=944, description="Test", lang="AZ")
+>>> result = gateway.create_order(amount=10, currency=944, description="12345/TAKSIT=5", lang="AZ")
 >>> print(result)
 ```
 
@@ -57,7 +57,7 @@ First step: set your crt and key files path as environment variables. (SEE `.env
 ```python
 >>> payment_obj = gateway.get_payment()
 >>> payment_obj
->>> Payment(amount=123456, order_id=12345, session_id='A12345', payment_url='https://e-commerce.kapitalbank.az/index.jsp', status_code='00',order_description='xxxxxx', currency=944, language_code='RU')
+>>> Payment(amount=123456, order_id=12345, session_id='A12345', payment_url='https://e-commerce.kapitalbank.az/index.jsp', status_code='00',order_description='12345/TAKSIT=5', currency=944, language_code='RU')
 ```
 
 **Example: get_payment_status()**
