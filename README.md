@@ -13,6 +13,10 @@ Tested on Python 3.8+
 First step: set your crt and key files path as environment variables. (SEE `.env` file)
 
 
+```bash
+-> pip install requests
+```
+
 **Example (Create Order):**
 
 ```python
