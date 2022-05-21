@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 
 
 @dataclass
@@ -18,3 +19,14 @@ class PaymentStatus:
     order_id: int
     status_code: str
     state: str
+
+
+@dataclass
+class PaymentInformation:
+    order_id: int
+    state: str
+    amount: int
+    order_description: str
+    fee: int
+    create_date: datetime
+    pay_date: datetime or None

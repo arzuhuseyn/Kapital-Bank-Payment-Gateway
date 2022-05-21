@@ -54,6 +54,22 @@ First step: set your crt and key files path as environment variables. (SEE `.env
 >>> PaymentStatus(order_id=12345, status_code='00', state='CREATED')
 ```
 
+
+**Example (Get Order Information):**
+
+```python
+>>> result = gateway.get_order_information(order_id=12345, session_id="A12345", lang="AZ")
+>>> print(result)
+```
+
+**Result:**
+
+ returns `PaymentInformation` object
+
+```python
+>>> PaymentInformation(order_id=12345, state='CREATED', amount=10, order_description='12345/TAKSIT=5', fee=0,           create_date=datetime.datetime(2022, 5, 21, 3, 45, 4), pay_date=datetime.datetime(2022, 5, 21, 3, 45, 31))
+```
+
 ### Methods
 
 **Example: get_payment()**
@@ -61,7 +77,7 @@ First step: set your crt and key files path as environment variables. (SEE `.env
 ```python
 >>> payment_obj = gateway.get_payment()
 >>> payment_obj
->>> Payment(amount=123456, order_id=12345, session_id='A12345', payment_url='https://e-commerce.kapitalbank.az/index.jsp', status_code='00',order_description='12345/TAKSIT=5', currency=944, language_code='RU')
+>>> Payment(amount=10, order_id=12345, session_id='A12345', payment_url='https://e-commerce.kapitalbank.az/index.jsp', status_code='00',order_description='12345/TAKSIT=5', currency=944, language_code='RU')
 ```
 
 **Example: get_payment_status()**
@@ -71,5 +87,12 @@ First step: set your crt and key files path as environment variables. (SEE `.env
 >>> payment_status_obj
 >>> PaymentStatus(order_id=12345, status_code='00', state='CREATED')
 ```
+
+**Example: get_payment_information()**
+
+```python
+>>> payment_information_obj = gateway.get_payment_information()
+>>> payment_information_obj
+>>> PaymentInformation(order_id=12345, state='CREATED', amount=10, order_description='12345/TAKSIT=5', fee=0,           create_date=datetime.datetime(2022, 5, 21, 3, 45, 4), pay_date=datetime.datetime(2022, 5, 21, 3, 45, 31))
 
 ***(C) Arzu Hussein***

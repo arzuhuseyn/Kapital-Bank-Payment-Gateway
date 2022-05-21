@@ -1,3 +1,4 @@
+import datetime
 import unittest
 
 from .base import KapitalPayment
@@ -15,7 +16,7 @@ class KapitalPaymentTest(unittest.TestCase):
     def test_create_order(self):
         transaction = self.gateway.create_order(amount=10, currency=944, description="Test", lang="AZ")
         payment_obj=self.gateway.get_payment()
-        result = {'url': f'https://e-commerce.kapitalbank.az/?ORDERID={payment_obj.order_id}&SESSIONID={payment_obj.session_id}'}
+        result = {'url': f'{payment_obj.payment_url}?ORDERID={payment_obj.order_id}&SESSIONID={payment_obj.session_id}'}
         self.assertDictEqual(result, transaction)
         self.assertEqual(payment_obj.status_code, '00')
 
@@ -28,3 +29,13 @@ class KapitalPaymentTest(unittest.TestCase):
         )
         self.assertEqual("00", order_status.status_code)
         self.assertEqual("CREATED", order_status.state)
+
+    def test_get_order_information(self):
+        transaction = self.gateway.create_order(amount=10, currency=944, description="Test", lang="AZ")
+        payment_obj=self.gateway.get_payment()
+        order_information = self.gateway.get_order_information(
+            order_id=payment_obj.order_id,
+            session_id=payment_obj.session_id
+        )
+        self.assertEqual("CREATED", order_information.state)
+        self.assertIsInstance(order_information.create_date, datetime.datetime)
