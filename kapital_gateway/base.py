@@ -10,8 +10,8 @@ class KapitalPayment:
     BASE_URL = 'https://e-commerce.kapitalbank.az'
     PORT = '5443'
     
-    CERT_FILE = os.getenv("KAPITAL_CERT_FILE", "./certs/salamdoktor.crt")
-    KEY_FILE = os.getenv("KAPITAL_KEY_FILE", "./certs/salamdoktor.key")
+    CERT_FILE = os.getenv("KAPITAL_CERT_FILE", "./certs/E1000010.crt")
+    KEY_FILE = os.getenv("KAPITAL_KEY_FILE", "./certs/E1000010.key")
 
     def __init__(
         self,
