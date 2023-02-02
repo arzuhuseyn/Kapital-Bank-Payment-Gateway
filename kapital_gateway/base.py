@@ -7,7 +7,7 @@ from xml.dom import minidom
 from .payment import Payment, PaymentInformation, PaymentStatus
 
 class KapitalPayment:
-    BASE_URL = 'https://e-commerce.kapitalbank.az'
+    BASE_URL = os.getenv("KAPITAL_BASE_URL", "https://tstpg.kapitalbank.az")
     PORT = '5443'
     
     CERT_FILE = os.getenv("KAPITAL_CERT_FILE", "./certs/E1000010.crt")
@@ -144,6 +144,7 @@ class KapitalPayment:
         }
         xml_data=self.__build_createorder_xml(order_data)
         result=self.__post(xml_data)
+        print(result)
         self.__build_payment_obj(order_data, result)
         payment=self.get_payment()
         return {'url' : f'{payment.payment_url}?ORDERID={payment.order_id}&SESSIONID={payment.session_id}'}
