@@ -24,6 +24,8 @@ class PaymentStatus:
 @dataclass
 class PaymentInformation:
     order_id: int
+    session_id: str
+    order_type: str
     state: str
     amount: int
     order_description: str

@@ -47,7 +47,7 @@ class KapitalPayment:
             <Operation>CreateOrder</Operation>
             <Language>{data['lang']}</Language>
             <Order>
-                <OrderType>Purchase</OrderType>
+                <OrderType>{data['order_type']}</OrderType>
                 <Merchant>{data['merchant']}</Merchant>
                 <Amount>{data['amount']}</Amount>
                 <Currency>{data['currency']}</Currency>
@@ -86,6 +86,48 @@ class KapitalPayment:
                 <SessionID>{data['session_id']}</SessionID>
             </Request>
         </TKKPG>'''
+    
+
+    def __build_completion_xml(self, data: dict) -> str:
+        return f'''<?xml version="1.0" encoding="UTF-8"?>
+                <TKKPG>
+                    <Request>
+                            <Operation>Completion</Operation>
+                            <Language>{data['lang']}</Language>
+                            <Order>
+                                    <Merchant>{data['merchant']}</Merchant>
+                                    <OrderID>{data['order_id']}</OrderID>
+                            </Order>
+                            <SessionID>{data['session_id']}</SessionID>
+                            <Amount>{data['amount']}</Amount>
+                            <Description>{data['description']}</Description>
+                    </Request>
+                </TKKPG>'''
+    
+    def __build_reverse_xml(self,data: dict) -> str:
+        return f'''
+        <TKKPG>
+            <Request>
+                    <Operation>Reverse</Operation>
+                    <Language>{data['lang']}</Language>
+                    <Order>
+                            <Merchant>{self.merchant_id}</Merchant>
+                            <OrderID>{data['order_id']}</OrderID>
+                            <Positions>
+                                <Position>
+                                    <PaymentSubjectType>1</PaymentSubjectType>
+                                    <Quantity>1</Quantity>
+                                    <PaymentType>2</PaymentType>
+                                    <PaymentMethodType>1</PaymentMethodType>
+                                </Position>
+                            </Positions>
+                    </Order>
+                    <Description>{data['description']}</Description>
+                    <SessionID>{data['session_id']}</SessionID>
+                    <TranId></TranId>
+                    <Source>1</Source>
+            </Request>
+        </TKKPG>'''
 
     def __build_payment_obj(self, initial_data: dict, response: str) -> None:
         xml_data=minidom.parseString(response).documentElement
@@ -112,10 +154,13 @@ class KapitalPayment:
     def __build_payment_information_obj(self, response: str) -> None:
         xml_data=minidom.parseString(response).documentElement
         create_date = xml_data.getElementsByTagName('createDate')[0].firstChild.data
-        pay_date = xml_data.getElementsByTagName('payDate')[0].firstChild.data
+        pay_date_element = xml_data.getElementsByTagName('payDate')[0].firstChild
+        pay_date = pay_date_element.data if pay_date_element else 'null'
 
         self.__payment_information_instance=PaymentInformation(
             order_id=int(xml_data.getElementsByTagName('id')[0].firstChild.data),
+            session_id=xml_data.getElementsByTagName('SessionID')[0].firstChild.data,
+            order_type=xml_data.getElementsByTagName('OrderType')[0].firstChild.data,
             state=xml_data.getElementsByTagName('Orderstatus')[0].firstChild.data,
             amount=int(xml_data.getElementsByTagName('Amount')[0].firstChild.data),
             order_description=xml_data.getElementsByTagName('Description')[0].firstChild.data,
@@ -134,13 +179,14 @@ class KapitalPayment:
     def get_payment_information(self) -> PaymentInformation:
         return self.__payment_information_instance
 
-    def create_order(self, amount: int, currency: int, description: str, lang: str) -> dict:
+    def create_order(self, amount: int, currency: int, description: str, lang: str, pre_auth: bool=False) -> dict:
         order_data = {
             'merchant' : self.merchant_id,
             'amount' : amount,
             'currency': currency,
             'description': description,
-            'lang': lang
+            'lang': lang,
+            'order_type': 'PreAuth' if pre_auth else 'Purchase'
         }
         xml_data=self.__build_createorder_xml(order_data)
         result=self.__post(xml_data)
@@ -148,6 +194,36 @@ class KapitalPayment:
         self.__build_payment_obj(order_data, result)
         payment=self.get_payment()
         return {'url' : f'{payment.payment_url}?ORDERID={payment.order_id}&SESSIONID={payment.session_id}'}
+
+    def complete_order(self, order_id: int, session_id: str, amount: int, description: str, lang: str = "AZ") -> str:
+        order_data = {
+            'merchant' : self.merchant_id,
+            'order_id' : order_id,
+            'session_id': session_id,
+            'amount': amount,
+            'description': description,
+            'lang' : lang
+        }
+        xml_data = self.__build_completion_xml(order_data)
+        result=self.__post(xml_data)
+        xml_data=minidom.parseString(result).documentElement
+        status_code = xml_data.getElementsByTagName('Status')[0].firstChild.data
+        return status_code
+    
+    def reverse_order(self, order_id:int, session_id, description, lang: str = "AZ"):
+        order_data = {
+            'merchant' : self.merchant_id,
+            'order_id' : order_id,
+            'session_id': session_id,
+            'lang' : lang,
+            'description': description
+        }
+        xml_data = self.__build_reverse_xml(order_data)
+        result=self.__post(xml_data)
+        print(result)
+        xml_data=minidom.parseString(result).documentElement
+        status_code = xml_data.getElementsByTagName('Status')[0].firstChild.data
+        return status_code
 
     def get_order_status(self, order_id: int, session_id: str, lang: str = "AZ") -> PaymentStatus:
         order_data = {
@@ -158,6 +234,7 @@ class KapitalPayment:
         }
         xml_data = self.__build_getorderstatus_xml(order_data)
         result=self.__post(xml_data)
+        print(result)
         self.__build_payment_status_obj(result)
         return self.get_payment_status()
     
@@ -170,6 +247,7 @@ class KapitalPayment:
         }
         xml_data = self.__build_getorderinformation_xml(order_data)
         result=self.__post(xml_data)
+        print(result)
         self.__build_payment_information_obj(result)
         return self.get_payment_information()
 
