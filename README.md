@@ -32,12 +32,30 @@ First step: set your crt and key files path as environment variables. (SEE `.env
 >>> result = gateway.create_order(amount=10, currency=944, description="12345/TAKSIT=5", lang="AZ")
 >>> print(result)
 ```
+For PreAuth Request use `pre_auth=True` (default is False)
+[More information about PreAuth](https://pg.kapitalbank.az/docs#preAuth-req "KapitalBank Documentation")
 
 **Result:**
 
 ```python
 >>> {'url' : 'https://e-commerce.kapitalbank.az/?ORDERID=12345&SESSIONID=A12345'}
 ```
+
+**Example (Complete/Reverse PreAuth Order):**
+
+```python
+>>> result = gateway.complete_order(order_id=12345, session_id="A12345",amount=10\
+description='54321',lang="AZ")
+>>> print(result)
+'00'
+>>> result = gateway.reverse_order(order_id=12345, session_id="A12345"\
+description='54321',lang="AZ")
+>>> print(result)
+'00'
+```
+
+##### complete order description change order description
+##### reverse order description append to original order description
 
 **Example (Check Order Status):**
 
@@ -67,7 +85,7 @@ First step: set your crt and key files path as environment variables. (SEE `.env
  returns `PaymentInformation` object
 
 ```python
->>> PaymentInformation(order_id=12345, state='CREATED', amount=10, order_description='12345/TAKSIT=5', fee=0,           create_date=datetime.datetime(2022, 5, 21, 3, 45, 4), pay_date=datetime.datetime(2022, 5, 21, 3, 45, 31))
+>>> PaymentInformation(order_id=12345, session_id='A12345', order_type='Purchase' state='CREATED', amount=10, order_description='12345/TAKSIT=5', fee=0, create_date=datetime.datetime(2022, 5, 21, 3, 45, 4), pay_date=datetime.datetime(2022, 5, 21, 3, 45, 31))
 ```
 
 ### Methods
@@ -77,7 +95,8 @@ First step: set your crt and key files path as environment variables. (SEE `.env
 ```python
 >>> payment_obj = gateway.get_payment()
 >>> payment_obj
->>> Payment(amount=10, order_id=12345, session_id='A12345', payment_url='https://e-commerce.kapitalbank.az/index.jsp', status_code='00',order_description='12345/TAKSIT=5', currency=944, language_code='RU')
+>>> Payment(amount=10, order_id=12345, session_id='A12345', payment_url='https://e-commerce.kapitalbank.az/index.jsp'\
+status_code='00',order_description='12345/TAKSIT=5', currency=944, language_code='RU')
 ```
 
 **Example: get_payment_status()**
@@ -93,7 +112,6 @@ First step: set your crt and key files path as environment variables. (SEE `.env
 ```python
 >>> payment_information_obj = gateway.get_payment_information()
 >>> payment_information_obj
->>> PaymentInformation(order_id=12345, state='CREATED', amount=10, order_description='12345/TAKSIT=5', fee=0,           create_date=datetime.datetime(2022, 5, 21, 3, 45, 4), pay_date=datetime.datetime(2022, 5, 21, 3, 45, 31))
+>>> PaymentInformation(order_id=12345, session_id='A12345', order_type='Purchase' state='CREATED', amount=10, order_description='12345/TAKSIT=5', fee=0, create_date=datetime.datetime(2022, 5, 21, 3, 45, 4), pay_date=datetime.datetime(2022, 5, 21, 3, 45, 31))
 ```
 
-***(C) Arzu Hussein***
