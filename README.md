@@ -94,5 +94,6 @@ First step: set your crt and key files path as environment variables. (SEE `.env
 >>> payment_information_obj = gateway.get_payment_information()
 >>> payment_information_obj
 >>> PaymentInformation(order_id=12345, state='CREATED', amount=10, order_description='12345/TAKSIT=5', fee=0,           create_date=datetime.datetime(2022, 5, 21, 3, 45, 4), pay_date=datetime.datetime(2022, 5, 21, 3, 45, 31))
+```
 
 ***(C) Arzu Hussein***
