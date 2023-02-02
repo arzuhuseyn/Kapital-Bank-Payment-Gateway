@@ -54,9 +54,9 @@ description='54321',lang="AZ")
 '00'
 ```
 
-complete order description change order description
+complete order description change order description (54321)
 
-reverse order description append to original order description
+reverse order description append to original order description (1234554321)
 
 **Example (Check Order Status):**
 
