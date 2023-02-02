@@ -190,7 +190,6 @@ class KapitalPayment:
         }
         xml_data=self.__build_createorder_xml(order_data)
         result=self.__post(xml_data)
-        print(result)
         self.__build_payment_obj(order_data, result)
         payment=self.get_payment()
         return {'url' : f'{payment.payment_url}?ORDERID={payment.order_id}&SESSIONID={payment.session_id}'}
@@ -206,8 +205,8 @@ class KapitalPayment:
         }
         xml_data = self.__build_completion_xml(order_data)
         result=self.__post(xml_data)
-        xml_data=minidom.parseString(result).documentElement
-        status_code = xml_data.getElementsByTagName('Status')[0].firstChild.data
+        response_xml=minidom.parseString(result).documentElement
+        status_code = response_xml.getElementsByTagName('Status')[0].firstChild.data
         return status_code
     
     def reverse_order(self, order_id:int, session_id, description, lang: str = "AZ"):
@@ -220,9 +219,8 @@ class KapitalPayment:
         }
         xml_data = self.__build_reverse_xml(order_data)
         result=self.__post(xml_data)
-        print(result)
-        xml_data=minidom.parseString(result).documentElement
-        status_code = xml_data.getElementsByTagName('Status')[0].firstChild.data
+        response_xml=minidom.parseString(result).documentElement
+        status_code = response_xml.getElementsByTagName('Status')[0].firstChild.data
         return status_code
 
     def get_order_status(self, order_id: int, session_id: str, lang: str = "AZ") -> PaymentStatus:
@@ -234,7 +232,6 @@ class KapitalPayment:
         }
         xml_data = self.__build_getorderstatus_xml(order_data)
         result=self.__post(xml_data)
-        print(result)
         self.__build_payment_status_obj(result)
         return self.get_payment_status()
     
@@ -247,7 +244,6 @@ class KapitalPayment:
         }
         xml_data = self.__build_getorderinformation_xml(order_data)
         result=self.__post(xml_data)
-        print(result)
         self.__build_payment_information_obj(result)
         return self.get_payment_information()
 
